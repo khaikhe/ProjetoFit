@@ -3,15 +3,28 @@ import Link from "next/link";
 import Button from "@/componentes/Button";
 import Input from "@/componentes/Input";
 import { Form, Formik } from "formik";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import * as Yup from "yup";
 import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react"
 
 export default function Register() {
     const [error, setError] = useState("");
     const [isFormSubmitting, setFormSubmitting] = useState(false);
 
     const router = useRouter();
+    const{ status } = useSession();
+    useEffect(()=>{
+        if(status === "authenticated"){
+            router.push("/");
+        }
+    },[status, router]);
+
+    if (status !== "unauthenticated"){
+        return null;
+    }
+
+
     const initialValues = {
         nome: "",
         email: "",
@@ -45,7 +58,7 @@ export default function Register() {
     async function handleSubmit(values, { resetForm }) {
         setFormSubmitting(true);
         try {
-            const response = await fetch("/api", {
+            const response = await fetch("/api/register", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -80,7 +93,7 @@ export default function Register() {
     }
 
     return (
-        <main className="min-h-screen flex items-center justify-center">
+        <main className="min-h-screen flex items-center justify-center bg-cover bg-center" style={{ backgroundImage: "url('/img/imagem2.webp')"}}>
             <Formik
                 initialValues={initialValues}
                 validationSchema={validationSchema}
@@ -89,7 +102,7 @@ export default function Register() {
                 {({ values }) => (
                     <Form
                         noValidate
-                        className="flex flex-col gap-2 p-4 border border-zinc-600 min-w-[300px] bg-white"
+                        className="flex flex-col gap-2 p-4 border border-zinc-600 min-w-[300px] bg-transparent backdrop-filter backdrop-blur-lg"
                     >
                         <Input
                          name="nome"
@@ -121,7 +134,7 @@ export default function Register() {
                             type="submit"
                             text={isFormSubmitting ? "Carregando..." : "Inscrever-se"}
                             disabled={isFormSubmitting}
-                            className="bg-green-500 text-white rounded p-2 cursor-pointer"
+                            className="bg-orange-600 text-white rounded p-2 cursor-pointer"
                         />
                         {error && (
                             <span className="text-red-600 text-sm text-center">{error}</span>
