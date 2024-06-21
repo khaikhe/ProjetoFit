@@ -1,6 +1,6 @@
 
 import User from "@/models/user";
-import NextAuth from "next-auth/next";
+import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
 import connect from "@/utils/db";
@@ -40,8 +40,9 @@ const options = NextAuth({
 }})],
 
     pages: {
-        erros:"/login",
+        error:"/login",
     },
+    secret:process.env.NEXTAUTH_SECRET
 });
 
 export {options as GET, options as POST };
