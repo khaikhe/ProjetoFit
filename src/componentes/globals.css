@@ -1,0 +1,17 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  -webkit-text-size-adjust: 100%; /* Para navegadores que suportam a propriedade -webkit-text-size-adjust */
+  text-size-adjust: 100%; /* Para navegadores que suportam a propriedade text-size-adjust */
+}
+
+body {
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+}
