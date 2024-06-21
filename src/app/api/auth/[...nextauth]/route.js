@@ -40,7 +40,7 @@ const options = NextAuth({
 }})],
 
     pages: {
-        erros:"/login",
+        error:"/login",
     },
 });
 
