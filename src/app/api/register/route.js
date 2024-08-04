@@ -1,43 +1,48 @@
+
 import User from "@/models/user";
-import { NextResponse } from "next/server";
-import bcryptjs from "bcryptjs";
+import NextAuth from "next-auth";
+import CredentialsProvider from "next-auth/providers/credentials";
+import bcrypt from "bcryptjs";
 import connect from "@/utils/db";
 
-export async function POST(req) {
-    try {
-        const { nome, email, password } = await req.json();
 
-        await connect();
+const options = NextAuth({
+    providers: [CredentialsProvider({
+        id: "Credentials",
+        name: "Credentials",
+        async authorize(credentials){
+            await connect();
+            try {
+                const user = await User.findOne({
+                    email: credentials.email,
+                });
 
-        const emailExists = await User.findOne({ email });
+                if (user) {
+                    const validPassword = await bcrypt.compare(
+                        credentials.password,
+                        user.password
+                    );
 
-        if (emailExists){
-            return NextResponse.json({
-                message: "E-mail ja esta cadastrado! ",
-                status: 409,
-            });
-        }
-        const hashedPassword = await bcryptjs.hash(password, 5);
-
-        const newUser = new User({
-            nome,
-            email,
-            password: hashedPassword,
-        });
-
-        await newUser.save();
-
-        return NextResponse.json({
-            message: "Usuario cadastrado com sucesso! ",
-            status: 201,
-        });
-
-
-    } catch (error) {
-        return NextResponse.json({
-            error: " Falha ao cadastrar usuário ",
-            status: 500,
-        });
-    }
-
+                    if (validPassword) {
+                        return user;
+                    } else {
+                        throw new Error ("Credenciais erradas!");
+                    }
+                }
+                    else{
+                        throw new Error ("Email errado!");
+                    }
+                
+        
+    } catch(error){
+        throw new Error(error);
 }
+}})],
+
+    pages: {
+        error:"/login",
+    },
+    secret:process.env.NEXTAUTH_SECRET
+});
+
+export {options as GET, options as POST };
