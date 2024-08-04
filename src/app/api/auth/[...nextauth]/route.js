@@ -12,6 +12,7 @@ const authOptions = {
       name: "Credentials",
       async authorize(credentials) {
         try {
+          await prisma.$connect();
           const user = await prisma.user.findUnique({
             where: { email: credentials.email },
           });
@@ -32,6 +33,8 @@ const authOptions = {
           }
         } catch (error) {
           throw new Error(error.message);
+        } finally {
+          await prisma.$disconnect();
         }
       },
     }),
